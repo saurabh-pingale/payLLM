@@ -18,4 +18,18 @@
     gap: 2rem;
     text-align: center;
   }
+
+  .wallet-button-container {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .wallet-button {
+    background-color: black !important;
+    color: white !important;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+  
 }
