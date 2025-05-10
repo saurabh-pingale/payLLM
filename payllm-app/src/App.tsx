@@ -8,10 +8,7 @@ import './styles/App.scss';
 const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showChat, setShowChat] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "Hi, I'm DeepSeek.", sender: 'ai' },
-    { id: 2, text: "How can I help you today?", sender: 'ai' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);

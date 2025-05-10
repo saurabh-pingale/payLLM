@@ -8,9 +8,9 @@ interface ModelOption {
 }
 
 const modelOptions: ModelOption[] = [
-  { id: 'default', name: 'Default', placeholder:'Ask text based queries' },
-  { id: 'veo2', name: 'Veo2',  placeholder:''},
-  { id: 'claude', name: 'Claude Sonnet',  placeholder:''},
+  { id: 'default', name: 'Default', placeholder:'Ask general text queries' },
+  { id: 'veo2', name: 'Veo2',  placeholder:'Generate videos or Describe about your video'},
+  { id: 'claude', name: 'Claude Sonnet',  placeholder:'Generate indepth responses'},
 ];
 
 interface SearchBoxProps {
@@ -51,7 +51,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={`Ask with ${selectedModel.name}`}
+          placeholder={selectedModel.placeholder}
           className="search-input"
         />
       </div>
