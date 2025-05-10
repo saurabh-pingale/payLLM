@@ -1,14 +1,11 @@
 import uvicorn
+import logging
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional
-import logging
 
-from handlers import generate_video_handler
-from config import check_environment
+from models import VideoGenerationRequest, TavusVideoRequest
+from services import VideoGenerationService
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -24,15 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class VideoGenerationRequest(BaseModel):
-    prompt: str
-    project_id: Optional[str] = None
-    location: Optional[str] = "us-central1"
-    model_name: Optional[str] = "videogeneration@001"
-    
-    class Config:
-        protected_namespaces = ()
-
 @app.get("/")
 async def root():
     return {"message": "Video Generation API"}
@@ -40,18 +28,25 @@ async def root():
 @app.post("/generate-video")
 async def generate_video(request: VideoGenerationRequest = Body(...)):
     try:
-        video_url = await generate_video_handler(
-            prompt=request.prompt,
-            project_id=request.project_id,
-            location=request.location,
-            model_name=request.model_name
+        service = VideoGenerationService()
+        video_url = await service.generate_video_handler(request.prompt)
+        return {"status": "success", "video_url": video_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/generate-tavus-video")
+async def generate_tavus_video(request: TavusVideoRequest = Body(...)):
+    try:
+        service = VideoGenerationService()
+        video_url = await service.generate_video_handler(
+            replica_id=request.replica_id,
+            script=request.script,
+            callback_url=request.callback_url
         )
         return {"status": "success", "video_url": video_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    check_environment()
-    
     logging.info("Starting Video Generation API server on port 8001")
     uvicorn.run(app, host="0.0.0.0", port=8001)
