@@ -1,0 +1,21 @@
+@import './variable.scss';
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: #fff;
+
+  .welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    gap: 2rem;
+    text-align: center;
+  }
+}
