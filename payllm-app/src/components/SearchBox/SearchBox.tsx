@@ -1,6 +1,6 @@
 import React, { useState, KeyboardEvent } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { convertSolToLamports } from '../../utils/converstion';
 import './SearchBox.scss';
 
@@ -27,26 +27,29 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const { publicKey, sendTransaction, connected } = useWallet();
 
   const requestSol = async (publicKey: PublicKey) => {
-    const recipient = new PublicKey('DTrXdM5a3X4dcSZRGF18Q1f1kLa8eoYThiFeV4uu5nwQ');
-    const lamports = convertSolToLamports(0.01);
+      const recipient = new PublicKey('DTrXdM5a3X4dcSZRGF18Q1f1kLa8eoYThiFeV4uu5nwQ');
+      const lamports = convertSolToLamports(0.01);
 
-    const transaction = new Transaction();
-    const sendSolInstruction = SystemProgram.transfer({
-      fromPubkey: publicKey,
-      toPubkey: recipient,
-      lamports,
-    })
-    transaction.add(sendSolInstruction)
+    const instructions = [
+      SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: recipient,
+        lamports,
+      }),
+    ];
 
-    const {
-      context: { slot: minContextSlot },
-      value: { blockhash, lastValidBlockHeight }
-    } = await connection.getLatestBlockhashAndContext();
+    let latestBlockhash = await connection.getLatestBlockhash()
+    const messageLegacy = new TransactionMessage({
+      payerKey: publicKey,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions,
+    }).compileToLegacyMessage();
 
-    const signature = await sendTransaction(transaction, connection, { minContextSlot });
-    await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
-    // await connection.confirmTransaction(signature, 'processed');
-    console.log('Transaction successful:', signature);
+    const transation = new VersionedTransaction(messageLegacy)
+    const signature = await sendTransaction(transation, connection);
+    await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
+    console.log(signature);
+
   }
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
