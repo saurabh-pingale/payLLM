@@ -51,8 +51,7 @@ async def generate_video_veo_handler(prompt: str) -> str:
 
 async def generate_video_tavus_handler(
     replica_id: str,
-    script: str,
-    callback_url: Optional[str] = None
+    script: str
 ) -> str:
     try:
         logger.info(f"Generating Tavus video for replica: {replica_id}")
@@ -63,12 +62,9 @@ async def generate_video_tavus_handler(
         }
         
         payload = {
-            "replica_id": replica_id,
+            "replica_id": 'rb17cf590e15',
             "script": script
         }
-        
-        if callback_url:
-            payload["callback_url"] = callback_url
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -80,12 +76,10 @@ async def generate_video_tavus_handler(
             
             response.raise_for_status()
             video_data = response.json()
-            
             # Adjust this based on actual Tavus API response structure
-            video_url = video_data.get("video_url") or video_data.get("url")
+            video_url = video_data.get("hosted_url")
             if not video_url:
                 raise Exception("No video URL in Tavus API response")
-            
             logger.info(f"Tavus video generated successfully: {video_url}")
             return video_url
             

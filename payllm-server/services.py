@@ -12,10 +12,8 @@ class VideoGenerationService:
         self,
         replica_id: str,
         script: str,
-        callback_url: Optional[str] = None
     ) -> str:
         return await generate_video_tavus_handler(
             replica_id=replica_id,
-            script=script,
-            callback_url=callback_url
+            script=script
         )

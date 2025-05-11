@@ -40,8 +40,7 @@ async def generate_tavus_video(request: TavusVideoRequest = Body(...)):
         service = VideoGenerationService()
         video_url = await service.generate_video_tavus_service(
             replica_id=request.replica_id,
-            script=request.script,
-            callback_url=request.callback_url
+            script=request.script
         )
         return {"status": "success", "video_url": video_url}
     except Exception as e:
