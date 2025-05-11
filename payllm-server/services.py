@@ -1,5 +1,5 @@
 from typing import Optional
-from handlers import generate_video_veo_handler, generate_video_tavus_handler
+from external_api_services import generate_video_veo_handler, generate_video_tavus_handler
 
 class VideoGenerationService:
     def __init__(self):

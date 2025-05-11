@@ -1,10 +1,12 @@
 import httpx
+import time
 import logging
 from typing import Optional
+from google import genai
+from google.genai import types
 
-from external_services import ExternalVideoGenerationService
 from constants import DEFAULT_LOCATION, DEFAULT_MODEL_NAME, TAVUS_API_URL
-from config import PROJECT_ID, TAVUS_API_KEY
+from config import PROJECT_ID, TAVUS_API_KEY, DEFAULT_GCP_BUCKET
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,23 +18,31 @@ async def generate_video_veo_handler(prompt: str) -> str:
     try:
         logger.info(f"Received video generation request with prompt: {prompt}")
         
-        project_id = PROJECT_ID
-            
-        # Create external service instance
-        external_service = ExternalVideoGenerationService(
-            project_id=project_id,
-            location=DEFAULT_LOCATION
-        )
-        
-        # Generate the video
-        logger.info("Generating video...")
-        video_url = external_service.generate_video_with_vertex_ai(
+        client = genai.Client(vertexai=True, project=PROJECT_ID, location=DEFAULT_LOCATION)
+        video_model = DEFAULT_MODEL_NAME
+
+        aspect_ratio = "16:9"
+        output_gcs = DEFAULT_GCP_BUCKET
+
+        operation = client.models.generate_videos(
+            model=video_model,
             prompt=prompt,
-            model_name=DEFAULT_MODEL_NAME
+            config=types.GenerateVideosConfig(
+                aspect_ratio=aspect_ratio,
+                output_gcs_uri=output_gcs,
+                number_of_videos=1,
+                duration_seconds=5,
+                person_generation="dont_allow",
+                enhance_prompt=True,
+            ),
         )
-        
-        logger.info(f"Video generated successfully: {video_url}")
-        return video_url
+
+        while not operation.done:
+            time.sleep(15)
+            operation = client.operations.get(operation)
+            print(operation)
+
+        return operation.result.generated_videos[0].video.uri
         
     except Exception as e:
         logger.error(f"Error generating video: {str(e)}", exc_info=True)
