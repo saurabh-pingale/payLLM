@@ -1,4 +1,5 @@
-from typing import Optional
+from google.cloud import storage
+from datetime import timedelta
 from external_api_services import generate_video_veo_handler, generate_video_tavus_handler
 
 class VideoGenerationService:
@@ -7,6 +8,18 @@ class VideoGenerationService:
 
     async def generate_video_veo_service(self, prompt: str) -> str:
         return await generate_video_veo_handler(prompt=prompt)
+
+    async def generate_signed_url(self, bucket_name, blob_name, expiration_minutes=60):
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+
+        url = blob.generate_signed_url(
+            expiration=timedelta(minutes=expiration_minutes),
+            method="GET"
+        )
+        return url
+
     
     async def generate_video_tavus_service(
         self,

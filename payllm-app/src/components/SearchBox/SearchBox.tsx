@@ -38,8 +38,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
     const transation = new VersionedTransaction(messageLegacy)
     const signature = await sendTransaction(transation, connection);
     await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
+    //TODO - Show it as popup signature
     console.log(signature);
-
   }
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {

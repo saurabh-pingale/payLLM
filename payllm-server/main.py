@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 
 from models import VideoGenerationRequest, TavusVideoRequest
+from config import DEFAULT_GCP_BUCKET_NAME
 from services import VideoGenerationService
 
 logging.basicConfig(
@@ -33,6 +34,12 @@ async def generate_video(request: VideoGenerationRequest = Body(...)):
         return {"status": "success", "video_url": video_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/video/veo/signed-url")
+async def get_signed_video_url(blob_path: str):
+    service = VideoGenerationService()
+    url = await service.generate_signed_url(DEFAULT_GCP_BUCKET_NAME, blob_path)
+    return {"url": url}
 
 @app.post("/video/tavus")
 async def generate_tavus_video(request: TavusVideoRequest = Body(...)):

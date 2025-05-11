@@ -12,7 +12,12 @@ export const fetchVideoByVeo = async (query: string) => {
         body: JSON.stringify({ prompt: query })
     })
     const data = await response.json()
-    return data
+    if(data?.video_url){
+        const formatted_url = `https://storage.cloud.google.com/${data?.video_url}`
+        return formatted_url
+    }else{
+        return 'Your prompt is prohited current safety rules, Try rephrasing the prompt.'
+    }
 }
 
 export const fetchVideoByTarus = async (query: string) => {
@@ -25,7 +30,7 @@ export const fetchVideoByTarus = async (query: string) => {
     if(data?.video_url){
         return data?.video_url
     }else{
-        return 'An error occured'
+        return 'Something went wrong'
     }
     
 }

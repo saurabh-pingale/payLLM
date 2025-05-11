@@ -42,7 +42,9 @@ async def generate_video_veo_handler(prompt: str) -> str:
             operation = client.operations.get(operation)
             print(operation)
 
-        return operation.result.generated_videos[0].video.uri
+        uri = operation.result.generated_videos[0].video.uri
+        path = uri.replace("gs://", "", 1)
+        return path
         
     except Exception as e:
         logger.error(f"Error generating video: {str(e)}", exc_info=True)
