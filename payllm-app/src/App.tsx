@@ -11,15 +11,11 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showChat, setShowChat] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [modelType, setModelType] = useState('')
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async ({ query, modelType }: { query: string, modelType: string }) => {
     setSearchQuery(query);
-    setMessages(prev => [
-      ...prev,
-      { id: Date.now(), text: query, sender: 'user' },
-      { id: Date.now() + 1, text: `I'm DeepSeek. How can I help you with "${query}"?`, sender: 'ai' }
-    ]);
+    setModelType(modelType)
     setShowChat(true);
   };
 
@@ -36,7 +32,7 @@ const App: React.FC = () => {
             <SearchBox onSearch={handleSearch} />
           </div>
         ) : (
-          <ChatPage messages={messages} onNewMessage={handleSearch} />
+          <ChatPage query={searchQuery} onNewMessage={handleSearch} modelType={modelType} />
         )}
       </div>
     </SolanaProvider>

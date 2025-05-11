@@ -1,23 +1,13 @@
 import React, { useState, KeyboardEvent } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { convertSolToLamports } from '../../utils/converstion';
+import { convertSolToLamports } from '../../utils/helper';
+import { modelOptions, SOL_RECEIVER_ADDRESS } from '../../common/constants';
+import { ModelOption } from '../../common/types';
 import './SearchBox.scss';
 
-interface ModelOption {
-  id: string;
-  name: string;
-  placeholder: string;
-}
-
-const modelOptions: ModelOption[] = [
-  { id: 'default', name: 'Default', placeholder: 'Ask general text queries' },
-  { id: 'veo2', name: 'Veo2', placeholder: 'Generate videos or Describe about your video' },
-  { id: 'claude', name: 'Claude Sonnet', placeholder: 'Generate indepth responses' },
-];
-
 interface SearchBoxProps {
-  onSearch: (query: string, model: string) => void;
+  onSearch: ({ query, modelType }: { query: string, modelType: string }) => void;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
@@ -27,8 +17,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const { publicKey, sendTransaction, connected } = useWallet();
 
   const requestSol = async (publicKey: PublicKey) => {
-      const recipient = new PublicKey('DTrXdM5a3X4dcSZRGF18Q1f1kLa8eoYThiFeV4uu5nwQ');
-      const lamports = convertSolToLamports(0.01);
+    const recipient = new PublicKey(SOL_RECEIVER_ADDRESS);
+    const lamports = convertSolToLamports(0.001);
 
     const instructions = [
       SystemProgram.transfer({
@@ -60,7 +50,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           return;
         }
         await requestSol(publicKey)
-        onSearch(query, selectedModel.id);
+        onSearch({ query, modelType: selectedModel.id });
       }
     } catch (err) {
       console.error('Transaction failed:', err);

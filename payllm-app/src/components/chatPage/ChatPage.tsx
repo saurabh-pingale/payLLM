@@ -1,13 +1,16 @@
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Message } from '../../types';
+import { fetchResource } from '../../utils/helper';
 import './ChatPage.scss';
 
 interface ChatPageProps {
-  messages: Message[];
-  onNewMessage: (query: string) => void;
+  query: string;
+  onNewMessage: ({ query, modelType }: { query: string, modelType: string }) => void;
+  modelType: string
 }
 
-const ChatPage: React.FC<ChatPageProps> = ({ messages, onNewMessage }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -16,18 +19,34 @@ const ChatPage: React.FC<ChatPageProps> = ({ messages, onNewMessage }) => {
   };
 
   useEffect(() => {
+    getResourcesOnMessage()
     scrollToBottom();
-  }, [messages]);
+  }, [query]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue.trim()) {
-      onNewMessage(inputValue);
+      onNewMessage({ query: inputValue, modelType });
       setInputValue('');
     }
   };
 
+  const getResourcesOnMessage = async () => {
+    setMessages(
+      [
+        { id: Date.now(), text: query, sender: 'user' },
+        { id: Date.now() + 1, text: 'Loading', sender: 'ai' }
+      ]);
+
+
+    const response = await fetchResource({ modelType, query })
+    setMessages([
+      { id: Date.now(), text: query, sender: 'user' },
+      { id: Date.now() + 1, text: response, sender: 'ai' }
+    ]);
+  }
+
   return (
-    <div className="deepseek-chat-container">
+    <div className="payllm-chat-container">
       <div className="chat-messages">
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.sender}`}>
@@ -45,22 +64,22 @@ const ChatPage: React.FC<ChatPageProps> = ({ messages, onNewMessage }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Message DeepSeek"
+            placeholder="Message PayLLM"
             className="chat-input"
           />
-          <button 
+          <button
             className="send-button"
             disabled={!inputValue.trim()}
             onClick={() => {
               if (inputValue.trim()) {
-                onNewMessage(inputValue);
+                onNewMessage({ query: inputValue, modelType });
                 setInputValue('');
               }
             }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
