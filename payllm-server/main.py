@@ -1,5 +1,15 @@
 import uvicorn
+import logging
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+
+from models import VideoGenerationRequest, TavusVideoRequest
+from services import VideoGenerationService
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 app = FastAPI()
 
@@ -13,7 +23,30 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "working"}
+
+@app.post("/video/veo")
+async def generate_video(request: VideoGenerationRequest = Body(...)):
+    try:
+        service = VideoGenerationService()
+        video_url = await service.generate_video_veo_service(request.prompt)
+        return {"status": "success", "video_url": video_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/video/tavus")
+async def generate_tavus_video(request: TavusVideoRequest = Body(...)):
+    try:
+        service = VideoGenerationService()
+        video_url = await service.generate_video_tavus_service(
+            replica_id=request.replica_id,
+            script=request.script,
+            callback_url=request.callback_url
+        )
+        return {"status": "success", "video_url": video_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
+    logging.info("Starting Video Generation API server on port 8001")
     uvicorn.run(app, host="0.0.0.0", port=8001)
