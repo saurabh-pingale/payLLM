@@ -23,22 +23,22 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Video Generation API"}
+    return {"message": "working"}
 
-@app.post("/generate-video")
+@app.post("/video/veo")
 async def generate_video(request: VideoGenerationRequest = Body(...)):
     try:
         service = VideoGenerationService()
-        video_url = await service.generate_video_handler(request.prompt)
+        video_url = await service.generate_video_veo_service(request.prompt)
         return {"status": "success", "video_url": video_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/generate-tavus-video")
+@app.post("/video/tavus")
 async def generate_tavus_video(request: TavusVideoRequest = Body(...)):
     try:
         service = VideoGenerationService()
-        video_url = await service.generate_video_handler(
+        video_url = await service.generate_video_tavus_service(
             replica_id=request.replica_id,
             script=request.script,
             callback_url=request.callback_url

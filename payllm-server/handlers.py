@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-async def generate_video_handler(prompt: str) -> str:
+async def generate_video_veo_handler(prompt: str) -> str:
     try:
         logger.info(f"Received video generation request with prompt: {prompt}")
         
@@ -39,7 +39,7 @@ async def generate_video_handler(prompt: str) -> str:
         raise Exception(f"Failed to generate video: {str(e)}")
     
 
-async def generate_tavus_video_handler(
+async def generate_video_tavus_handler(
     replica_id: str,
     script: str,
     callback_url: Optional[str] = None
