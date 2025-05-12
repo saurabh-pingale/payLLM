@@ -3,7 +3,6 @@ import SearchBox from './components/SearchBox/SearchBox.tsx';
 import ChatPage from './components/chatPage/ChatPage.tsx';
 import WelcomeMessage from './components/WelcomeMessage/WelcomeMessage.tsx';
 import { SolanaProvider } from './utils/SolanaProvider.tsx';
-import { Message } from './types.js';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import './styles/App.scss';
 import '@solana/wallet-adapter-react-ui/styles.css';

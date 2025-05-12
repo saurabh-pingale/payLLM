@@ -20,3 +20,7 @@ export const generateRandomId = (prefix = 'rb') => {
     const random = Math.random().toString(16).slice(2, 12); // 10 hex chars
     return `${prefix}${random}`;
   };
+
+export const getSolFee = () => {
+    return 0.001
+}

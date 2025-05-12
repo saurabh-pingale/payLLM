@@ -1,0 +1,115 @@
+export type RecordIDL = {
+    "address": "Aj2ptVm1MKuYzFSKovq78LiNTpdAZi5YxBiWB144sT29",
+    "metadata": {
+      "name": "payllm_sol",
+      "version": "0.1.0",
+      "spec": "0.1.0",
+      "description": "Created with Anchor"
+    },
+    "instructions": [
+      {
+        "name": "recordData",
+        "discriminator": [
+          186,
+          45,
+          149,
+          46,
+          73,
+          198,
+          21,
+          96
+        ],
+        "accounts": [
+          {
+            "name": "record",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "owner",
+            "writable": true,
+            "signer": true
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111"
+          }
+        ],
+        "args": [
+          {
+            "name": "aiQuery",
+            "type": "string"
+          },
+          {
+            "name": "aiModel",
+            "type": "string"
+          },
+          {
+            "name": "credits",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "userAddress",
+            "type": "string"
+          },
+          {
+            "name": "userQuery",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "RecordState",
+        "discriminator": [
+          7,
+          131,
+          229,
+          191,
+          112,
+          142,
+          41,
+          172
+        ]
+      }
+    ],
+    "types": [
+      {
+        "name": "RecordState",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "userQuery",
+              "type": "string"
+            },
+            {
+              "name": "aiQuery",
+              "type": "string"
+            },
+            {
+              "name": "aiModel",
+              "type": "string"
+            },
+            {
+              "name": "credits",
+              "type": "u64"
+            },
+            {
+              "name": "userAddress",
+              "type": "string"
+            },
+            {
+              "name": "amount",
+              "type": "u64"
+            }
+          ]
+        }
+      }
+    ]
+  }

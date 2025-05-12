@@ -12,7 +12,7 @@ pub mod payllm_sol {
         ai_model: String,
         credits: u64,
         amount: u64,
-        user_address: Pubkey,
+        user_address: String,
         user_query: String,
     ) -> Result<()> {
         let record: &mut Account<'_, RecordState> = &mut ctx.accounts.record;
@@ -33,7 +33,7 @@ pub struct RecordState{
     pub ai_query: String,
     pub ai_model: String,
     pub credits: u64,
-    pub user_address: Pubkey,
+    pub user_address: String,
     amount: u64
 }
 

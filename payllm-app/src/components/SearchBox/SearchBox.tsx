@@ -1,8 +1,8 @@
 import React, { useState, KeyboardEvent } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { convertSolToLamports } from '../../utils/helper';
-import { modelOptions, SOL_RECEIVER_ADDRESS } from '../../common/constants';
+import { convertSolToLamports, getSolFee } from '../../utils/helper';
+import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
 import { ModelOption } from '../../common/types';
 import './SearchBox.scss';
 
@@ -17,8 +17,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const { publicKey, sendTransaction, connected } = useWallet();
 
   const requestSol = async (publicKey: PublicKey) => {
-    const recipient = new PublicKey(SOL_RECEIVER_ADDRESS);
-    const lamports = convertSolToLamports(0.001);
+    const recipient = new PublicKey(SOL_ADMIN_RECEIVER_ADDRESS);
+    const sol_fee = getSolFee()
+    const lamports = convertSolToLamports(sol_fee);
 
     const instructions = [
       SystemProgram.transfer({
@@ -49,7 +50,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           alert('Please connect your wallet.');
           return;
         }
-        await requestSol(publicKey)
+        //TODO - uncomment
+        // await requestSol(publicKey)
+        localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
         onSearch({ query, modelType: selectedModel.id });
       }
     } catch (err) {

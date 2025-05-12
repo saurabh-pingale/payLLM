@@ -1,6 +1,8 @@
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Message } from '../../types';
-import { fetchResource } from '../../utils/helper';
+import { fetchResource, getSolFee } from '../../utils/helper';
+import { record_message_onchain } from '../../common/contract';
+import { SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
 import './ChatPage.scss';
 
 interface ChatPageProps {
@@ -43,6 +45,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
       { id: Date.now(), text: query, sender: 'user' },
       { id: Date.now() + 1, text: response, sender: 'ai' }
     ]);
+    //TODO - uncomment it
+    // record_message_onchain({
+    //   ai_query: response, 
+    //   user_query:query,
+    //   ai_model: modelType,
+    //   credits:10,
+    //   amount: getSolFee(),
+    //   receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
+    // })
   }
 
   return (
