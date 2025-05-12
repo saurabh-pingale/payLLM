@@ -5,6 +5,8 @@ import { convertSolToLamports, getSolFee } from '../../utils/helper';
 import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
 import { ModelOption } from '../../common/types';
 import './SearchBox.scss';
+import Popup from '../Popup/Popup';
+import TypingLoader from '../TypingLoader/TypingLoader';
 
 interface SearchBoxProps {
   onSearch: ({ query, modelType }: { query: string, modelType: string }) => void;
@@ -14,6 +16,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const { connection } = useConnection();
   const [query, setQuery] = useState('');
   const [selectedModel, setSelectedModel] = useState<ModelOption>(modelOptions[0]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [signature, setSignature] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { publicKey, sendTransaction, connected } = useWallet();
 
   const requestSol = async (publicKey: PublicKey) => {
@@ -39,25 +44,37 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
     const transation = new VersionedTransaction(messageLegacy)
     const signature = await sendTransaction(transation, connection);
     await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
-    //TODO - Show it as popup signature
-    console.log(signature);
+    setSignature(signature);
+    setShowPopup(true);
   }
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     try {
       if (e.key === 'Enter' && query.trim()) {
-        if (!connected || !publicKey) {
-          alert('Please connect your wallet.');
-          return;
-        }
-        //TODO - uncomment
-        // await requestSol(publicKey)
-        localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
-        onSearch({ query, modelType: selectedModel.id });
+        setIsLoading(true);
+
+        setTimeout(() => {
+          try {
+            if (!connected || !publicKey) {
+              alert('Please connect your wallet.');
+              return;
+            }
+            // TODO - uncomment
+            // await requestSol(publicKey)
+            localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
+            onSearch({ query, modelType: selectedModel.id });
+          } catch (error) {
+            console.error('Transaction failed:', error);
+            alert('Transaction failed. Please try again.');
+          } finally {
+            setIsLoading(false);
+          }
+        }, 1500);
       }
     } catch (err) {
       console.error('Transaction failed:', err);
       alert('Transaction failed. Please try again.');
+      setIsLoading(false);
     }
   };
 
@@ -88,12 +105,29 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           placeholder={selectedModel.placeholder}
           className="search-input"
         />
+
+        {isLoading && <TypingLoader />}
       </div>
 
       <div className="search-options">
         <span className="search-option">Depth Search</span>
         <span className="search-option">Video Generation</span>
       </div>
+
+      <Popup isOpen={showPopup} onClose={() => setShowPopup(false)}>
+        <h3>Transaction Successful</h3>
+        <p>Signature: {signature}</p>
+        <p>View on explorer: 
+          <a 
+            href={`https://explorer.solana.com/tx/${signature}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ color: '#6e48aa', marginLeft: '0.5rem' }}
+          >
+            Open Explorer
+          </a>
+        </p>
+      </Popup>
     </div>
   );
 };

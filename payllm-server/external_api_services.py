@@ -32,7 +32,7 @@ async def generate_video_veo_handler(prompt: str) -> str:
                 output_gcs_uri=output_gcs,
                 number_of_videos=1,
                 duration_seconds=5,
-                person_generation="dont_allow",
+                person_generation="allow",
                 enhance_prompt=True,
             ),
         )
@@ -41,6 +41,11 @@ async def generate_video_veo_handler(prompt: str) -> str:
             time.sleep(15)
             operation = client.operations.get(operation)
             print(operation)
+
+        if not operation.result.generated_videos:
+            reasons = getattr(operation.result, 'rai_media_filtered_reasons', [])
+            reason_text = "; ".join(reasons) if reasons else "Unknown reason"
+            raise Exception(f"Video generation blocked by safety filters. Reason: {reason_text}")    
 
         uri = operation.result.generated_videos[0].video.uri
         path = uri.replace("gs://", "", 1)

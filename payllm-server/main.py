@@ -37,9 +37,12 @@ async def generate_video(request: VideoGenerationRequest = Body(...)):
     
 @app.post("/video/veo/signed-url")
 async def get_signed_video_url(blob_path: str):
-    service = VideoGenerationService()
-    url = await service.generate_signed_url(DEFAULT_GCP_BUCKET_NAME, blob_path)
-    return {"url": url}
+    try:
+        service = VideoGenerationService()
+        url = service.generate_signed_url(DEFAULT_GCP_BUCKET_NAME, blob_path)
+        return {"url": url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/video/tavus")
 async def generate_tavus_video(request: TavusVideoRequest = Body(...)):

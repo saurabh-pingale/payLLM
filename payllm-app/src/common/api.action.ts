@@ -13,8 +13,20 @@ export const fetchVideoByVeo = async (query: string) => {
     })
     const data = await response.json()
     if(data?.video_url){
-        const formatted_url = `https://storage.cloud.google.com/${data?.video_url}`
-        return formatted_url
+        const parts = data.video_url.split('/');
+        if (parts.length < 2) return 'Invalid video path format.';
+        const blob_path = `${parts[1]}/${parts[2]}`;
+
+        const signedUrlRes = await fetch(`${BACKEND_API}/video/veo/signed-url?blob_path=${encodeURIComponent(blob_path)}`,{
+            method: 'POST'
+        });
+        const signedUrlData = await signedUrlRes.json();
+
+        if (signedUrlData?.url) {
+            return { type: 'video', url: signedUrlData.url };
+        } else {
+            return 'Failed to generate signed URL.';
+        }
     }else{
         return 'Your prompt is prohited current safety rules, Try rephrasing the prompt.'
     }

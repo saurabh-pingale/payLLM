@@ -9,10 +9,13 @@ class VideoGenerationService:
     async def generate_video_veo_service(self, prompt: str) -> str:
         return await generate_video_veo_handler(prompt=prompt)
 
-    async def generate_signed_url(self, bucket_name, blob_name, expiration_minutes=60):
+    def generate_signed_url(self, bucket_name, blob_name, expiration_minutes=60):
         client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(blob_name)
+
+        if not blob.exists():
+            raise FileNotFoundError(f"The blob '{blob_name}' does not exist in bucket '{bucket_name}'.")
 
         url = blob.generate_signed_url(
             expiration=timedelta(minutes=expiration_minutes),

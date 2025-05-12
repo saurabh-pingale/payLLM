@@ -3,7 +3,9 @@ import { Message } from '../../types';
 import { fetchResource, getSolFee } from '../../utils/helper';
 import { record_message_onchain } from '../../common/contract';
 import { SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
+import { VideoContent } from '../../common/types';
 import './ChatPage.scss';
+import TypingLoader from '../TypingLoader/TypingLoader';
 
 interface ChatPageProps {
   query: string;
@@ -40,11 +42,21 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
       ]);
 
 
-    const response = await fetchResource({ modelType, query })
+    const response = await fetchResource({ modelType, query });
+    let aiMessage: Message;
+    if (typeof response === 'string') {
+      aiMessage = { id: Date.now() + 1, text: response, sender: 'ai' };
+    } else if (response && response.type === 'video') {
+      aiMessage = { id: Date.now() + 1, text: response, sender: 'ai' };
+    } else {
+      aiMessage = { id: Date.now() + 1, text: JSON.stringify(response), sender: 'ai' };
+    }
+
     setMessages([
       { id: Date.now(), text: query, sender: 'user' },
-      { id: Date.now() + 1, text: response, sender: 'ai' }
+      aiMessage
     ]);
+
     //TODO - uncomment it
     // record_message_onchain({
     //   ai_query: response, 
@@ -62,7 +74,26 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.sender}`}>
             <div className="message-content">
-              {message.text}
+              {(() => {
+                if (typeof message.text === 'string') {
+                  if (message.text === 'Loading') {
+                    return <TypingLoader />;
+                  }
+                  return message.text;
+                }
+
+                const videoContent = message.text as VideoContent;
+                if(videoContent.type === 'video') {
+                  return (
+                    <video 
+                      src={videoContent.url}
+                      controls
+                      style={{ width: '100%', borderRadius: '8px' }}
+                    />
+                );
+              } 
+              return null;
+              })()}
             </div>
           </div>
         ))}
