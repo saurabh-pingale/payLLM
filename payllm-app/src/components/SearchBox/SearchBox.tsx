@@ -4,9 +4,10 @@ import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } fr
 import { convertSolToLamports, getSolFee } from '../../utils/helper';
 import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
 import { ModelOption } from '../../common/types';
-import './SearchBox.scss';
 import Popup from '../Popup/Popup';
 import TypingLoader from '../TypingLoader/TypingLoader';
+import { fetchCredits, manageCredits } from '../../common/api.action';
+import './SearchBox.scss';
 
 interface SearchBoxProps {
   onSearch: ({ query, modelType }: { query: string, modelType: string }) => void;
@@ -52,16 +53,20 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
     try {
       if (e.key === 'Enter' && query.trim()) {
         setIsLoading(true);
-
-        setTimeout(() => {
+        // setTimeout(() => {
           try {
             if (!connected || !publicKey) {
               alert('Please connect your wallet.');
               return;
             }
-            // TODO - uncomment
-            // await requestSol(publicKey)
-            localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
+            const walletAddress = publicKey.toString()
+            const data = await fetchCredits(walletAddress)
+            if(!data?.credits){
+              // TODO - uncomment
+              await requestSol(publicKey)
+              await manageCredits(walletAddress, 10)
+            }
+            localStorage.setItem('payllm-user-wallet-address', walletAddress)
             onSearch({ query, modelType: selectedModel.id });
           } catch (error) {
             console.error('Transaction failed:', error);
@@ -69,7 +74,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           } finally {
             setIsLoading(false);
           }
-        }, 1500);
+        // }, 1500);
       }
     } catch (err) {
       console.error('Transaction failed:', err);
@@ -119,7 +124,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
         <p>Signature: {signature}</p>
         <p>View on explorer: 
           <a 
-            href={`https://explorer.solana.com/tx/${signature}`} 
+            href={`https://explorer.solana.com/?cluster=devnet/tx/${signature}`} 
             target="_blank" 
             rel="noopener noreferrer"
             style={{ color: '#6e48aa', marginLeft: '0.5rem' }}

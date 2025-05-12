@@ -4,8 +4,9 @@ import { fetchResource, getSolFee } from '../../utils/helper';
 import { record_message_onchain } from '../../common/contract';
 import { SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
 import { VideoContent } from '../../common/types';
-import './ChatPage.scss';
 import TypingLoader from '../TypingLoader/TypingLoader';
+import { fetchCredits, manageCredits } from '../../common/api.action';
+import './ChatPage.scss';
 
 interface ChatPageProps {
   query: string;
@@ -17,6 +18,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [credits, setCredits] = useState(0)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -34,6 +36,20 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
     }
   };
 
+  const handleManageCredits =  async() => {
+    const walletAddress = localStorage.getItem('payllm-user-wallet-address') as string
+    const data = await fetchCredits(walletAddress as  string)
+    setCredits(Number(data?.credits) ? Number(data?.credits) -5 : 0)
+    if(Number(data?.credits)){
+      const totalCredits = Number(data?.credits) - 5
+      await manageCredits(walletAddress, totalCredits)
+    }else{
+      alert('Not having credits please recharge')
+      window.location.reload();
+      return
+    }
+  }
+
   const getResourcesOnMessage = async () => {
     setMessages(
       [
@@ -41,7 +57,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
         { id: Date.now() + 1, text: 'Loading', sender: 'ai' }
       ]);
 
-
+    await handleManageCredits()
     const response = await fetchResource({ modelType, query });
     let aiMessage: Message;
     if (typeof response === 'string') {
@@ -70,6 +86,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
 
   return (
     <div className="payllm-chat-container">
+      <p className='credits-text'>Credits - {credits}  </p>
       <div className="chat-messages">
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.sender}`}>

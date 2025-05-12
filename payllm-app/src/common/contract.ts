@@ -6,7 +6,7 @@ import { SOL_WALLET_KEYPAIR } from "./constants";
 import { RecordIDL } from "../common/idl";
 
 const secretKey = Uint8Array.from(
-    []
+    SOL_WALLET_KEYPAIR
 );
 
 interface RecordMessageOnchain{
