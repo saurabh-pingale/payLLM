@@ -47,7 +47,7 @@ export const fetchVideoByTarus = async (query: string) => {
     
 }
 
-export const fetchResponseByCluade = async (query: string) => {
+export const fetchResponseByClaude = async (query: string) => {
     const response = await fetch(`${BACKEND_API}/conversation/claude`, {
         method: 'POST',
         headers: headers,

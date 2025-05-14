@@ -51,13 +51,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     try {
-      if (e.key === 'Enter' && e.shiftKey) {
+      const shiftWithEnterKey = (e.key === 'Enter' && e.shiftKey)
+      if (shiftWithEnterKey) {
         return;
       }
-
-      if (e.key === 'Enter' && query.trim() && !e.shiftKey) {
+      const onlyWithEnterKey = (e.key === 'Enter' && query.trim() && !e.shiftKey)
+      if (onlyWithEnterKey) {
         e.preventDefault();
-
         const charLimit = selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER;
         if (query.length > charLimit) {
           alert(`Message exceeds ${charLimit} character limit`);
@@ -66,23 +66,20 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
 
         setIsLoading(true);
 
-        setTimeout(() => {
-          try {
-            if (!connected || !publicKey) {
-              alert('Please connect your wallet.');
-              return;
-            }
-            // TODO - uncomment
-            // await requestSol(publicKey)
-            localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
-            onSearch({ query, modelType: selectedModel.id });
-          } catch (error) {
-            console.error('Transaction failed:', error);
-            alert('Transaction failed. Please try again.');
-          } finally {
-            setIsLoading(false);
+        try {
+          if (!connected || !publicKey) {
+            alert('Please connect your wallet.');
+            return;
           }
-        }, 1500);
+          await requestSol(publicKey)
+          localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
+          onSearch({ query, modelType: selectedModel.id });
+        } catch (error) {
+          console.error('Transaction failed:', error);
+          alert('Transaction failed. Please try again.');
+        } finally {
+          setIsLoading(false);
+        }
       }
     } catch (err) {
       console.error('Transaction failed:', err);
@@ -94,7 +91,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const textarea = e.currentTarget;
     setQuery(textarea.value);
-    
+
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
@@ -122,7 +119,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           ref={textareaRef}
           value={query}
           onChange={handleInput}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleKeyDown as (e: any) => void}
           placeholder={selectedModel.placeholder}
           className="search-input"
           rows={1}
@@ -140,10 +137,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
       <Popup isOpen={showPopup} onClose={() => setShowPopup(false)}>
         <h3>Transaction Successful</h3>
         <p>Signature: {signature}</p>
-        <p>View on explorer: 
-          <a 
-            href={`https://explorer.solana.com/tx/${signature}`} 
-            target="_blank" 
+        <p>View on explorer:
+          <a
+            href={`https://explorer.solana.com/tx/${signature}`}
+            target="_blank"
             rel="noopener noreferrer"
             style={{ color: '#6e48aa', marginLeft: '0.5rem' }}
           >

@@ -1,6 +1,7 @@
 .vscode
 venv
 .env
+id.json
 __pycache__/
 payllm-server/video-459417-0ab3e6355337.json
-id.json
+payllm-server/service-account-key.json

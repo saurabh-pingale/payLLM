@@ -34,5 +34,9 @@ class VideoGenerationService:
             script=script
         )
 
+class TextGenerationService:
+    def __init__(self):
+        pass
+    
     async def generate_response_from_claude_service(self, query: str) -> str:
         return await generate_response_from_claude_handler(query=query)

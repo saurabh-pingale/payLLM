@@ -1,4 +1,4 @@
-import { fetchVideoByTarus, fetchVideoByVeo, fetchResponseByCluade } from "../common/api.action"
+import { fetchVideoByTarus, fetchVideoByVeo, fetchResponseByClaude } from "../common/api.action"
 import { MODEL_TYPE } from "../common/constants"
 
 export const convertSolToLamports = (sol: number) => {
@@ -13,7 +13,7 @@ export const fetchResource = async ({modelType, query}: {query: string, modelTyp
         const data = await fetchVideoByTarus(query)
         return data
     } else if(modelType === MODEL_TYPE.DEFAULT){
-        const data = await fetchResponseByCluade(query)
+        const data = await fetchResponseByClaude(query)
         return data
     }
 }
