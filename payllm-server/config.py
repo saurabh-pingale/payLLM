@@ -10,3 +10,6 @@ DEFAULT_GCP_BUCKET=os.environ.get("DEFAULT_GCP_BUCKET")
 
 #TAVUS
 TAVUS_API_KEY = os.environ.get("TAVUS_API_KEY")
+
+#CLAUDE
+CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")

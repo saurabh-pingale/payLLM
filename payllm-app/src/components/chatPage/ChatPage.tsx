@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Message } from '../../types';
 import { fetchResource, getSolFee } from '../../utils/helper';
 import { record_message_onchain } from '../../common/contract';
@@ -11,12 +11,12 @@ import './ChatPage.scss';
 interface ChatPageProps {
   query: string;
   onNewMessage: ({ query, modelType }: { query: string, modelType: string }) => void;
-  modelType: string
+  modelType: string;
+  onBack: () => void;
 }
 
-const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onBack }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [credits, setCredits] = useState(0)
 
@@ -28,13 +28,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
     getResourcesOnMessage()
     scrollToBottom();
   }, [query]);
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim()) {
-      onNewMessage({ query: inputValue, modelType });
-      setInputValue('');
-    }
-  };
 
   const handleManageCredits =  async() => {
     const walletAddress = localStorage.getItem('payllm-user-wallet-address') as string
@@ -73,20 +66,23 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
       aiMessage
     ]);
 
-    //TODO - uncomment it
-    // record_message_onchain({
-    //   ai_query: response, 
-    //   user_query:query,
-    //   ai_model: modelType,
-    //   credits:10,
-    //   amount: getSolFee(),
-    //   receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
-    // })
+    record_message_onchain({
+      ai_query: response, 
+      user_query:query,
+      ai_model: modelType,
+      credits:10,
+      amount: getSolFee(),
+      receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
+    })
   }
 
   return (
     <div className="payllm-chat-container">
       <p className='credits-text'>Credits - {credits}  </p>
+       <button className="back-button" onClick={onBack}>
+        ← GO BACK
+      </button>
+
       <div className="chat-messages">
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.sender}`}>
@@ -116,34 +112,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType }) =
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <div className="chat-input-container">
-        <div className="input-wrapper">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Message PayLLM"
-            className="chat-input"
-          />
-          <button
-            className="send-button"
-            disabled={!inputValue.trim()}
-            onClick={() => {
-              if (inputValue.trim()) {
-                onNewMessage({ query: inputValue, modelType });
-                setInputValue('');
-              }
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
       </div>
-    </div>
   );
 };
 

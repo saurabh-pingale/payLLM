@@ -12,7 +12,12 @@ export const MODEL_TYPE = {
 }
 
 export const modelOptions: ModelOption[] = [
-    { id: MODEL_TYPE.DEFAULT, name: 'Default', placeholder: 'Ask general text queries' },
+    { id: MODEL_TYPE.DEFAULT, name: 'Default', placeholder: 'Ask claude pro version' },
     { id: MODEL_TYPE.VEO, name: 'Veo2', placeholder: 'Generate or Describe about your video' },
     { id: MODEL_TYPE.TAVUS, name: 'Tavus', placeholder: 'Generate or Describe lipsync video' },
   ];
+
+export const MESSAGE_CHAR_LIMITS = {
+  DEFAULT: 4000,
+  OTHER: 2000
+};

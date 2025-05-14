@@ -1,8 +1,8 @@
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, KeyboardEvent, useRef } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { convertSolToLamports, getSolFee } from '../../utils/helper';
-import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
+import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS, MESSAGE_CHAR_LIMITS } from '../../common/constants';
 import { ModelOption } from '../../common/types';
 import Popup from '../Popup/Popup';
 import TypingLoader from '../TypingLoader/TypingLoader';
@@ -21,6 +21,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const [signature, setSignature] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { publicKey, sendTransaction, connected } = useWallet();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const requestSol = async (publicKey: PublicKey) => {
     const recipient = new PublicKey(SOL_ADMIN_RECEIVER_ADDRESS);
@@ -51,22 +52,32 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     try {
-      if (e.key === 'Enter' && query.trim()) {
+      const shiftWithEnterKey = (e.key === 'Enter' && e.shiftKey)
+      if (shiftWithEnterKey) {
+        return;
+      }
+      const onlyWithEnterKey = (e.key === 'Enter' && query.trim() && !e.shiftKey)
+      if (onlyWithEnterKey) {
+        e.preventDefault();
+        const charLimit = selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER;
+        if (query.length > charLimit) {
+          alert(`Message exceeds ${charLimit} character limit`);
+          return;
+        }
+
         setIsLoading(true);
-        // setTimeout(() => {
+
           try {
             if (!connected || !publicKey) {
               alert('Please connect your wallet.');
               return;
             }
+            await requestSol(publicKey)
             const walletAddress = publicKey.toString()
             const data = await fetchCredits(walletAddress)
             if(!data?.credits){
-              // TODO - uncomment
-              await requestSol(publicKey)
               await manageCredits(walletAddress, 10)
             }
-            localStorage.setItem('payllm-user-wallet-address', walletAddress)
             onSearch({ query, modelType: selectedModel.id });
           } catch (error) {
             console.error('Transaction failed:', error);
@@ -74,13 +85,20 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           } finally {
             setIsLoading(false);
           }
-        // }, 1500);
       }
     } catch (err) {
       console.error('Transaction failed:', err);
       alert('Transaction failed. Please try again.');
       setIsLoading(false);
     }
+  };
+
+  const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const textarea = e.currentTarget;
+    setQuery(textarea.value);
+
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
   return (
@@ -102,13 +120,15 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           </select>
         </div>
 
-        <input
-          type="text"
+        <textarea
+          ref={textareaRef}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown as (e: any) => void}
           placeholder={selectedModel.placeholder}
           className="search-input"
+          rows={1}
+          maxLength={selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER}
         />
 
         {isLoading && <TypingLoader />}

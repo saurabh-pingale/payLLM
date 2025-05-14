@@ -1,6 +1,6 @@
 from google.cloud import storage
 from datetime import timedelta
-from external_api_services import generate_video_veo_handler, generate_video_tavus_handler
+from external_api_services import generate_video_veo_handler, generate_video_tavus_handler, generate_response_from_claude_handler
 
 class VideoGenerationService:
     def __init__(self):
@@ -33,3 +33,10 @@ class VideoGenerationService:
             replica_id=replica_id,
             script=script
         )
+
+class TextGenerationService:
+    def __init__(self):
+        pass
+    
+    async def generate_response_from_claude_service(self, query: str) -> str:
+        return await generate_response_from_claude_handler(query=query)

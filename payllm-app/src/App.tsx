@@ -31,7 +31,7 @@ const App: React.FC = () => {
             <SearchBox onSearch={handleSearch} />
           </div>
         ) : (
-          <ChatPage query={searchQuery} onNewMessage={handleSearch} modelType={modelType} />
+          <ChatPage query={searchQuery} onNewMessage={handleSearch} modelType={modelType} onBack={() => setShowChat(false)} />
         )}
       </div>
     </SolanaProvider>

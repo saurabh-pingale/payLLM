@@ -10,7 +10,7 @@
   .search-input-wrapper {
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     background: white;
     border: 1px solid $border-color;
     border-radius: 50px;
@@ -24,22 +24,25 @@
       box-shadow: 0 2px 15px rgba(110, 72, 170, 0.2);
     }
 
-    .model-badge select {
-      font-size: 0.9rem;
-      padding: 0.6rem 2.5rem 0.6rem 1rem;
-      border: none;
-      background: $light-gray;
-      border-radius: 20px;
-      cursor: pointer;
-      outline: none;
-      white-space: nowrap;
-      max-width: 105px;
-      text-overflow: ellipsis;
-      appearance: none;
-      background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-      background-repeat: no-repeat;
-      background-position: right 0.6rem center;
-      background-size: 20px;
+    .model-badge { 
+      margin-top: 4px;
+        select {
+        font-size: 0.9rem;
+        padding: 0.6rem 2.5rem 0.6rem 1rem;
+        border: none;
+        background: $light-gray;
+        border-radius: 20px;
+        cursor: pointer;
+        outline: none;
+        white-space: nowrap;
+        max-width: 105px;
+        text-overflow: ellipsis;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 0.6rem center;
+        background-size: 20px;
+      }
     }
 
 
@@ -49,6 +52,24 @@
       border: none;
       outline: none;
       background: transparent;
+      resize: none;
+      min-height: 24px;
+      max-height: 200px;
+      overflow-y: auto;
+      line-height: 1.5;
+      font-family: inherit;
+      padding: 0;
+      margin: 0;
+      align-self: center;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
     }
   }
 

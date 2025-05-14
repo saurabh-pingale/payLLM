@@ -63,3 +63,13 @@ export const fetchCredits = async (walletAddress: string) => {
     const data = await response.json()
     return data
 }
+
+export const fetchResponseByClaude = async (query: string) => {
+    const response = await fetch(`${BACKEND_API}/conversation/claude`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ query })
+    })
+    const data = await response.json()
+    return data.message
+}
