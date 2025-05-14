@@ -1,8 +1,8 @@
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, KeyboardEvent, useRef } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { convertSolToLamports, getSolFee } from '../../utils/helper';
-import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
+import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS, MESSAGE_CHAR_LIMITS } from '../../common/constants';
 import { ModelOption } from '../../common/types';
 import './SearchBox.scss';
 import Popup from '../Popup/Popup';
@@ -20,6 +20,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   const [signature, setSignature] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { publicKey, sendTransaction, connected } = useWallet();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const requestSol = async (publicKey: PublicKey) => {
     const recipient = new PublicKey(SOL_ADMIN_RECEIVER_ADDRESS);
@@ -50,7 +51,19 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
 
   const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     try {
-      if (e.key === 'Enter' && query.trim()) {
+      if (e.key === 'Enter' && e.shiftKey) {
+        return;
+      }
+
+      if (e.key === 'Enter' && query.trim() && !e.shiftKey) {
+        e.preventDefault();
+
+        const charLimit = selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER;
+        if (query.length > charLimit) {
+          alert(`Message exceeds ${charLimit} character limit`);
+          return;
+        }
+
         setIsLoading(true);
 
         setTimeout(() => {
@@ -78,6 +91,14 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
     }
   };
 
+  const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const textarea = e.currentTarget;
+    setQuery(textarea.value);
+    
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  };
+
   return (
     <div className="search-container">
       <div className="search-input-wrapper">
@@ -97,13 +118,15 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           </select>
         </div>
 
-        <input
-          type="text"
+        <textarea
+          ref={textareaRef}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleInput}
           onKeyDown={handleKeyDown}
           placeholder={selectedModel.placeholder}
           className="search-input"
+          rows={1}
+          maxLength={selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER}
         />
 
         {isLoading && <TypingLoader />}

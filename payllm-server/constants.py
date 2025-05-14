@@ -1,3 +1,5 @@
 DEFAULT_LOCATION = "us-central1"
 DEFAULT_MODEL_NAME = "veo-2.0-generate-001"
 TAVUS_API_URL = "https://tavusapi.com/v2/videos"
+CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
+CLAUDE_MODEL_NAME = "claude-3-haiku-20240307"

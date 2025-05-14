@@ -1,4 +1,4 @@
-import { fetchVideoByTarus, fetchVideoByVeo } from "../common/api.action"
+import { fetchVideoByTarus, fetchVideoByVeo, fetchResponseByCluade } from "../common/api.action"
 import { MODEL_TYPE } from "../common/constants"
 
 export const convertSolToLamports = (sol: number) => {
@@ -12,8 +12,10 @@ export const fetchResource = async ({modelType, query}: {query: string, modelTyp
     } else if(modelType === MODEL_TYPE.TAVUS){
         const data = await fetchVideoByTarus(query)
         return data
-    } 
-    return 'Hello how can i help you ?'
+    } else if(modelType === MODEL_TYPE.DEFAULT){
+        const data = await fetchResponseByCluade(query)
+        return data
+    }
 }
 
 export const generateRandomId = (prefix = 'rb') => {

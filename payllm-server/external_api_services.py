@@ -5,8 +5,8 @@ from typing import Optional
 from google import genai
 from google.genai import types
 
-from constants import DEFAULT_LOCATION, DEFAULT_MODEL_NAME, TAVUS_API_URL
-from config import PROJECT_ID, TAVUS_API_KEY, DEFAULT_GCP_BUCKET
+from constants import DEFAULT_LOCATION, DEFAULT_MODEL_NAME, TAVUS_API_URL, CLAUDE_API_URL, CLAUDE_MODEL_NAME
+from config import PROJECT_ID, TAVUS_API_KEY, DEFAULT_GCP_BUCKET, CLAUDE_API_KEY
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,3 +96,41 @@ async def generate_video_tavus_handler(
     except Exception as e:
         logger.error(f"Error generating Tavus video: {str(e)}", exc_info=True)
         raise Exception(f"Failed to generate Tavus video: {str(e)}")
+
+
+async def generate_response_from_claude_handler(query: str):
+    try:
+        headers = {
+            "x-api-key": CLAUDE_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+            "accept": "application/json"
+        }
+
+        payload = {
+            "model": CLAUDE_MODEL_NAME,
+            "system": "You are a helpful assistant.",
+            "messages": [{"role": "user", "content": query}],
+            "temperature": 0.7,
+            "max_tokens": 4000,
+            "top_p": 0.9
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                CLAUDE_API_URL,
+                headers=headers,
+                json=payload,
+                timeout=30.0
+            )
+            response.raise_for_status()
+            json_response = response.json()
+            
+            content = json_response.get("content", [{}])[0].get("text", "")
+            if not content:
+                return "Something went wrong. Please try again."
+
+            return content
+    except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            return "Something went wrong. Please try again."

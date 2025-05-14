@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import VideoGenerationRequest, TavusVideoRequest
+from models import VideoGenerationRequest, TavusVideoRequest, QueryRequest
 from config import DEFAULT_GCP_BUCKET_NAME
 from services import VideoGenerationService
 
@@ -53,6 +53,17 @@ async def generate_tavus_video(request: TavusVideoRequest = Body(...)):
             script=request.script
         )
         return {"status": "success", "video_url": video_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/conversation/claude")
+async def generate_response_from_claude(request: QueryRequest):
+    try:
+        service = VideoGenerationService()
+        message = await service.generate_response_from_claude_service(
+            query=request.query
+        )
+        return {"status": "success", "message": message}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -12,3 +12,6 @@ class TavusVideoRequest(BaseModel):
     
     class Config:
         protected_namespaces = ()
+
+class QueryRequest(BaseModel):
+    query: str
