@@ -31,6 +31,12 @@
     }
   }
 
+  .credits-text{
+    position: absolute;
+    top: 55px;
+    right: 50px;
+  }
+
   .chat-messages {
     flex: 1;
     overflow-y: auto;

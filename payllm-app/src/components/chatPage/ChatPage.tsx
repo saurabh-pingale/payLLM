@@ -1,12 +1,12 @@
-import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
 import { Message } from '../../types';
 import { fetchResource, getSolFee } from '../../utils/helper';
 import { record_message_onchain } from '../../common/contract';
 import { SOL_ADMIN_RECEIVER_ADDRESS } from '../../common/constants';
 import { VideoContent } from '../../common/types';
-import './ChatPage.scss';
 import TypingLoader from '../TypingLoader/TypingLoader';
+import { fetchCredits, manageCredits } from '../../common/api.action';
+import './ChatPage.scss';
 
 interface ChatPageProps {
   query: string;
@@ -17,9 +17,8 @@ interface ChatPageProps {
 
 const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onBack }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+  const [credits, setCredits] = useState(0)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,6 +29,20 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
     scrollToBottom();
   }, [query]);
 
+  const handleManageCredits =  async() => {
+    const walletAddress = localStorage.getItem('payllm-user-wallet-address') as string
+    const data = await fetchCredits(walletAddress as  string)
+    setCredits(Number(data?.credits) ? Number(data?.credits) -5 : 0)
+    if(Number(data?.credits)){
+      const totalCredits = Number(data?.credits) - 5
+      await manageCredits(walletAddress, totalCredits)
+    }else{
+      alert('Not having credits please recharge')
+      window.location.reload();
+      return
+    }
+  }
+
   const getResourcesOnMessage = async () => {
     setMessages(
       [
@@ -37,6 +50,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
         { id: Date.now() + 1, text: 'Loading', sender: 'ai' }
       ]);
 
+    await handleManageCredits()
     const response = await fetchResource({ modelType, query });
     let aiMessage: Message;
     if (typeof response === 'string') {
@@ -52,19 +66,19 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
       aiMessage
     ]);
 
-    //TODO - uncomment it
-    // record_message_onchain({
-    //   ai_query: response, 
-    //   user_query:query,
-    //   ai_model: modelType,
-    //   credits:10,
-    //   amount: getSolFee(),
-    //   receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
-    // })
+    record_message_onchain({
+      ai_query: response, 
+      user_query:query,
+      ai_model: modelType,
+      credits:10,
+      amount: getSolFee(),
+      receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
+    })
   }
 
   return (
     <div className="payllm-chat-container">
+      <p className='credits-text'>Credits - {credits}  </p>
        <button className="back-button" onClick={onBack}>
         ← GO BACK
       </button>

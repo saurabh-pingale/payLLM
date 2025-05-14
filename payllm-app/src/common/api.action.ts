@@ -1,5 +1,5 @@
 import { generateRandomId } from "../utils/helper"
-import { BACKEND_API } from "./constants"
+import { BACKEND_API, FIREBASE_DB_API } from "./constants"
 
 const headers =  {
     'Content-Type': 'application/json',
@@ -45,6 +45,23 @@ export const fetchVideoByTarus = async (query: string) => {
         return 'Something went wrong'
     }
     
+}
+
+export const manageCredits = async (walletAddress: string, credits: number) => {
+    await fetch(`${FIREBASE_DB_API}/credits/${walletAddress}.json`, {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify({ credits })
+    })
+}
+
+export const fetchCredits = async (walletAddress: string) => {
+    const response = await fetch(`${FIREBASE_DB_API}/credits/${walletAddress}.json`, {
+        method: 'GET',
+        headers: headers
+    })
+    const data = await response.json()
+    return data
 }
 
 export const fetchResponseByClaude = async (query: string) => {

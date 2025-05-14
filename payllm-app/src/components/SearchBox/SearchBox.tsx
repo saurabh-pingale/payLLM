@@ -4,9 +4,10 @@ import { PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } fr
 import { convertSolToLamports, getSolFee } from '../../utils/helper';
 import { modelOptions, SOL_ADMIN_RECEIVER_ADDRESS, MESSAGE_CHAR_LIMITS } from '../../common/constants';
 import { ModelOption } from '../../common/types';
-import './SearchBox.scss';
 import Popup from '../Popup/Popup';
 import TypingLoader from '../TypingLoader/TypingLoader';
+import { fetchCredits, manageCredits } from '../../common/api.action';
+import './SearchBox.scss';
 
 interface SearchBoxProps {
   onSearch: ({ query, modelType }: { query: string, modelType: string }) => void;
@@ -66,20 +67,24 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
 
         setIsLoading(true);
 
-        try {
-          if (!connected || !publicKey) {
-            alert('Please connect your wallet.');
-            return;
+          try {
+            if (!connected || !publicKey) {
+              alert('Please connect your wallet.');
+              return;
+            }
+            await requestSol(publicKey)
+            const walletAddress = publicKey.toString()
+            const data = await fetchCredits(walletAddress)
+            if(!data?.credits){
+              await manageCredits(walletAddress, 10)
+            }
+            onSearch({ query, modelType: selectedModel.id });
+          } catch (error) {
+            console.error('Transaction failed:', error);
+            alert('Transaction failed. Please try again.');
+          } finally {
+            setIsLoading(false);
           }
-          await requestSol(publicKey)
-          localStorage.setItem('payllm-user-wallet-address', publicKey.toString())
-          onSearch({ query, modelType: selectedModel.id });
-        } catch (error) {
-          console.error('Transaction failed:', error);
-          alert('Transaction failed. Please try again.');
-        } finally {
-          setIsLoading(false);
-        }
       }
     } catch (err) {
       console.error('Transaction failed:', err);
@@ -137,10 +142,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
       <Popup isOpen={showPopup} onClose={() => setShowPopup(false)}>
         <h3>Transaction Successful</h3>
         <p>Signature: {signature}</p>
-        <p>View on explorer:
-          <a
-            href={`https://explorer.solana.com/tx/${signature}`}
-            target="_blank"
+        <p>View on explorer: 
+          <a 
+            href={`https://explorer.solana.com/?cluster=devnet/tx/${signature}`} 
+            target="_blank" 
             rel="noopener noreferrer"
             style={{ color: '#6e48aa', marginLeft: '0.5rem' }}
           >
