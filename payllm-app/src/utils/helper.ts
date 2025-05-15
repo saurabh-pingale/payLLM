@@ -12,7 +12,7 @@ export const fetchResource = async ({modelType, query}: {query: string, modelTyp
     } else if(modelType === MODEL_TYPE.TAVUS){
         const data = await fetchVideoByTarus(query)
         return data
-    } else if(modelType === MODEL_TYPE.DEFAULT){
+    } else if(modelType === MODEL_TYPE.CLAUDE){
         const data = await fetchResponseByClaude(query)
         return data
     }

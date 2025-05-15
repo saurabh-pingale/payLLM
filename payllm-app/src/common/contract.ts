@@ -19,6 +19,7 @@ interface RecordMessageOnchain{
 }
 
 export const record_message_onchain = async ({ai_query, ai_model, credits, amount, receiver, user_query}:RecordMessageOnchain) => {
+  try{
     const connection = new Connection(clusterApiUrl('devnet'), anchor.AnchorProvider.defaultOptions());
     const feePayer = Keypair.fromSecretKey(secretKey);
     const provider = new anchor.AnchorProvider(connection, {
@@ -56,4 +57,8 @@ export const record_message_onchain = async ({ai_query, ai_model, credits, amoun
 
     //TODO - Show on the chat
     console.log('---transactionSignature--', tx)
+  } catch(err){
+    console.log('Error occured', err)
+  }
+    
 }

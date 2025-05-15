@@ -59,7 +59,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
       const onlyWithEnterKey = (e.key === 'Enter' && query.trim() && !e.shiftKey)
       if (onlyWithEnterKey) {
         e.preventDefault();
-        const charLimit = selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER;
+        const charLimit = selectedModel.id === 'claude' ? MESSAGE_CHAR_LIMITS.CLAUDE : MESSAGE_CHAR_LIMITS.OTHER;
         if (query.length > charLimit) {
           alert(`Message exceeds ${charLimit} character limit`);
           return;
@@ -128,7 +128,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
           placeholder={selectedModel.placeholder}
           className="search-input"
           rows={1}
-          maxLength={selectedModel.id === 'default' ? MESSAGE_CHAR_LIMITS.DEFAULT : MESSAGE_CHAR_LIMITS.OTHER}
+          maxLength={selectedModel.id === 'claude' ? MESSAGE_CHAR_LIMITS.CLAUDE : MESSAGE_CHAR_LIMITS.OTHER}
         />
 
         {isLoading && <TypingLoader />}
