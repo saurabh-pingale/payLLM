@@ -16,7 +16,7 @@
     left: 0;
     right: 0;
     width: 100%;
-    background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+    background: black;
     color: white;
     padding: 8px 0;
     z-index: 1000;
@@ -58,7 +58,7 @@
   .wallet-container {
     position: absolute;
     top: 3.5rem; 
-    right: 1rem;
+    right: calc(50% - 400px + 20px);
     z-index: 100;
   }
 
@@ -74,12 +74,6 @@
     padding: 0 20px;
   }
  
-  .wallet-button-container {
-    position: relative;
-    top: 1rem;
-    right: 1rem;
-  }
-  
   .wallet-button {
     background-color: black !important;
     color: white !important;
