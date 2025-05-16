@@ -16,6 +16,7 @@ interface ChatPageProps {
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onBack }) => {
+  const [tx, setTx] = useState('')
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [credits, setCredits] = useState(0)
@@ -66,14 +67,16 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
       aiMessage
     ]);
 
-    record_message_onchain({
-      ai_query: response, 
-      user_query:query,
-      ai_model: modelType,
-      credits:10,
-      amount: getSolFee(),
-      receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
-    })
+  //todo - uncommment
+  // const transaction = record_message_onchain({
+  //     ai_query: response, 
+  //     user_query:query,
+  //     ai_model: modelType,
+  //     credits: credits,
+  //     amount: getSolFee(),
+  //     receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
+  //   })
+  //   setTx(transaction as any)
   }
 
   return (
@@ -108,8 +111,12 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
               return null;
               })()}
             </div>
+           
           </div>
         ))}
+       { messages[1]?.text!=="Loading" && <div style={{display:'flex'}}>
+         Recorded - <a href={`https://explorer.solana.com/tx/${tx}?cluster=devnet`}>Explorer</a>
+         </div>}
         <div ref={messagesEndRef} />
       </div>
       </div>

@@ -57,6 +57,7 @@ export const record_message_onchain = async ({ai_query, ai_model, credits, amoun
 
     //TODO - Show on the chat
     console.log('---transactionSignature--', tx)
+    return tx
   } catch(err){
     console.log('Error occured', err)
   }
