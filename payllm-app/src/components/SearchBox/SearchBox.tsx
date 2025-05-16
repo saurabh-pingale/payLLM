@@ -134,11 +134,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
         {isLoading && <TypingLoader />}
       </div>
 
-      <div className="search-options">
-        <span className="search-option">Depth Search</span>
-        <span className="search-option">Video Generation</span>
-      </div>
-
       <Popup isOpen={showPopup} onClose={() => setShowPopup(false)}>
         <h3>Transaction Successful</h3>
         <p>Signature: {signature}</p>
