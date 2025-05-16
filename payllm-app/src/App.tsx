@@ -21,8 +21,19 @@ const App: React.FC = () => {
   return (
     <SolanaProvider>
       <div className="app">
-        <div className="wallet-button-container">
-          <WalletMultiButton className="wallet-button" />
+        <div className="status-bar">
+          <div className="status-bar-content">
+            <span className="network-indicator">
+              <span className="indicator-dot"></span>
+              We Are In Devnet
+            </span>
+          </div>
+        </div>
+
+        <div className="wallet-container">
+          <div className="wallet-button-container">
+            <WalletMultiButton className="wallet-button" />
+          </div>
         </div>
 
         {!showChat ? (
