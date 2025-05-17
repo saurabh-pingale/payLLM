@@ -10,6 +10,8 @@
   .search-input-wrapper {
     width: 100%;
     display: flex;
+    position: relative;
+    align-items: center;
     background: white;
     border: 1px solid $border-color;
     border-radius: 50px;
@@ -24,7 +26,6 @@
     }
 
     .model-badge { 
-      margin-top: 4px;
         select {
         font-size: 0.9rem;
         padding: 0.6rem 2.5rem 0.6rem 1rem;
@@ -46,7 +47,7 @@
 
     .search-input {
       flex: 1;
-      font-size: 1rem;
+      font-size: 1.2rem;
       border: none;
       outline: none;
       background: transparent;

@@ -4,11 +4,9 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  max-width: 800px;
   margin: 0 auto;
   padding: 0 20px;
   background-color: #fff;
-  position: relative;
 
   .status-bar {
     position: fixed;
@@ -57,9 +55,8 @@
 
   .wallet-container {
     position: absolute;
-    top: 3.5rem; 
-    right: calc(50% - 400px + 20px);
-    z-index: 100;
+    top: 3rem;
+    right: 1rem;
   }
 
   .welcome-container {
@@ -70,8 +67,6 @@
     height: 80vh;
     gap: 2rem;
     text-align: center;
-     margin-top: 4rem; 
-    padding: 0 20px;
   }
  
   .wallet-button {
@@ -80,4 +75,19 @@
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
   } 
+
+  ._sendMessageButton_71e98_48 {
+    display: flex;
+    flex-direction: row-reverse;
+    height: 2rem; /* slightly bigger */
+    width: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+  
 }

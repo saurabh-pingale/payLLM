@@ -7,12 +7,16 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import './styles/App.scss';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
+interface HandleSearchProps { query: string, modelType: string, walletAddress: string }
+
 const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [modelType, setModelType] = useState('')
+  const [walletAddressRef, setWalletAddressRef] = useState<string>('')
 
-  const handleSearch = async ({ query, modelType }: { query: string, modelType: string }) => {
+  const handleSearch = async ({ query, modelType, walletAddress }: HandleSearchProps) => {
+    setWalletAddressRef(walletAddress as string)
     setSearchQuery(query);
     setModelType(modelType)
     setShowChat(true);
@@ -25,7 +29,7 @@ const App: React.FC = () => {
           <div className="status-bar-content">
             <span className="network-indicator">
               <span className="indicator-dot"></span>
-              We Are In Devnet
+              We are currently live in devnet
             </span>
           </div>
         </div>
@@ -42,7 +46,7 @@ const App: React.FC = () => {
             <SearchBox onSearch={handleSearch} />
           </div>
         ) : (
-          <ChatPage query={searchQuery} onNewMessage={handleSearch} modelType={modelType} onBack={() => setShowChat(false)} />
+          <ChatPage query={searchQuery} userWalletAddress={walletAddressRef} modelType={modelType} onBack={() => setShowChat(false)} />
         )}
       </div>
     </SolanaProvider>
