@@ -25,7 +25,7 @@ const App: React.FC = () => {
           <div className="status-bar-content">
             <span className="network-indicator">
               <span className="indicator-dot"></span>
-              We Are In Devnet
+              We are currently live in devnet
             </span>
           </div>
         </div>

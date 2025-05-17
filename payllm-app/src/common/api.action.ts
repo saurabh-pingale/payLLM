@@ -73,3 +73,21 @@ export const fetchResponseByClaude = async (query: string) => {
     const data = await response.json()
     return data.message
 }
+
+export const track_messages = async (response: any) => {
+    const timestamp = new Date().toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'UTC'
+        }).replace(/[, ]/g, '-').replace(/:/g, '-');
+    await fetch(`${FIREBASE_DB_API}/payllm/${timestamp}.json`, {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify({ response })
+    })
+}
