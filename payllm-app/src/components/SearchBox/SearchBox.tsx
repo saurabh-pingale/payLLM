@@ -10,7 +10,7 @@ import { fetchCredits, manageCredits } from '../../common/api.action';
 import './SearchBox.scss';
 
 interface SearchBoxProps {
-  onSearch: ({ query, modelType }: { query: string, modelType: string }) => void;
+  onSearch: ({ query, modelType, walletAddress }: { query: string, modelType: string, walletAddress: string }) => void;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
@@ -66,19 +66,19 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
         }
 
         setIsLoading(true);
-
+        let walletAddress;
           try {
             if (!connected || !publicKey) {
               alert('Please connect your wallet.');
               return;
             }
-            const walletAddress = publicKey.toString()
+            walletAddress = publicKey.toString()
             const data = await fetchCredits(walletAddress)
             if (!data?.credits) {
               await requestSol(publicKey)
               await manageCredits(walletAddress, 10)
             }
-            onSearch({ query, modelType: selectedModel.id });
+            onSearch({ query, modelType: selectedModel.id, walletAddress });
           } catch (error) {
             console.error('Transaction failed:', error);
             alert('Transaction failed. Please try again.');

@@ -10,12 +10,12 @@ import './ChatPage.scss';
 
 interface ChatPageProps {
   query: string;
-  onNewMessage: ({ query, modelType }: { query: string, modelType: string }) => void;
+  userWalletAddress: string;
   modelType: string;
   onBack: () => void;
 }
 
-const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onBack }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ query, userWalletAddress, modelType, onBack }) => {
   const [tx, setTx] = useState('')
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -31,7 +31,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
   }, [query]);
 
   const handleManageCredits =  async() => {
-    const walletAddress = localStorage.getItem('payllm-user-wallet-address') as string
+    const walletAddress = userWalletAddress as string
     const data = await fetchCredits(walletAddress as  string)
     setCredits(Number(data?.credits) ? Number(data?.credits) -5 : 0)
     if(Number(data?.credits)){
@@ -73,7 +73,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
       ai_model: modelType,
       credits: credits,
       amount: getSolFee(),
-      receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
+      receiver: userWalletAddress || SOL_ADMIN_RECEIVER_ADDRESS,
     })
 
   const transaction = await record_message_onchain({
@@ -82,7 +82,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ query, onNewMessage, modelType, onB
       ai_model: modelType,
       credits: credits,
       amount: getSolFee(),
-      receiver: localStorage.getItem('payllm-user-wallet-address') || SOL_ADMIN_RECEIVER_ADDRESS,
+      receiver: userWalletAddress || SOL_ADMIN_RECEIVER_ADDRESS,
     })
 
     setTx(transaction as any)
